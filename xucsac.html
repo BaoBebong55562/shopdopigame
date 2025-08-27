@@ -1,0 +1,741 @@
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Trò Chơi Đoán Xúc Xắc
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Darker background */
+        }
+        .history-win td {
+            color: #10B981; /* Green */
+        }
+        .history-loss td {
+            color: #EF4444; /* Red */
+        }
+        /* Custom scrollbar */
+        #history-log::-webkit-scrollbar {
+            width: 6px;
+        }
+        #history-log::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        #history-log::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 3px;
+        }
+        #history-log::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+        /* Dice rotation animation */
+        @keyframes dice-spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(1080deg);
+            }
+        }
+        .dice-spin {
+            animation: dice-spin 1.5s ease-in-out forwards;
+        }
+        /* Dice container for 3D style */
+        .dice-container {
+            perspective: 600px;
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+        .dice {
+            width: 80px;
+            height: 80px;
+            background-color: #111827;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #10B981;
+            color: #10B981;
+            font-weight: 700;
+            font-size: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+        .dice.spin {
+            animation: dice-spin 1.5s ease-in-out forwards;
+        }
+  </style>
+ </head>
+ <body class="text-gray-300 p-4 sm:p-6 md:p-8">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+   <!-- Cột Trò chơi (bên trái) -->
+   <div class="lg:col-span-2 bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col">
+    <h1 class="text-3xl font-bold text-cyan-400 mb-4">
+     Trò chơi
+    </h1>
+    <div class="bg-gray-900 p-4 rounded-lg text-sm space-y-1 mb-6">
+     <p>
+      <strong>
+       Quy tắc:
+      </strong>
+      Kết quả 3 xúc xắc ngẫu nhiên. Người chơi có thể đặt cược Tổng điểm trên 10 hoặc dưới 10, hoặc đoán tổng điểm xúc xắc.
+     </p>
+     <p>
+      -
+      <strong>
+       Trò 1 - Tổng điểm trên 10 / dưới 10:
+      </strong>
+      Nếu kết quả tổng là số trên 10 hoặc dưới 10 trùng với lựa chọn, thắng trả x1.85 điểm cược.
+     </p>
+     <p>
+      - Nếu kết quả tổng là 10, người chơi thua mất 1/2 điểm cược.
+     </p>
+     <p>
+      -
+      <strong>
+       Trò 2 - Đoán tổng điểm xúc xắc:
+      </strong>
+      Nếu đoán đúng tổng điểm xúc xắc (từ 3 đến 18), thắng trả x4.25 điểm cược.
+     </p>
+     <p>
+      - Cả 2 trò đều có mức cược tối thiểu 10.000 điểm và tối đa 100.000 điểm.
+     </p>
+     <p class="text-yellow-400">
+      <strong>
+       Lưu ý:
+      </strong>
+      Trò chơi chỉ mang tính giải trí, xả stress. Hãy chơi có trách nhiệm.
+     </p>
+    </div>
+    <!-- Khu vực hiển thị kết quả và xúc xắc -->
+    <div class="text-center my-8 flex flex-col items-center space-y-6">
+     <div class="flex justify-center space-x-6">
+      <div class="dice-container" id="dice1-container">
+       <div aria-label="Xúc xắc số 1" class="dice" id="dice1" role="img" tabindex="0">
+        ?
+       </div>
+      </div>
+      <div class="dice-container" id="dice2-container">
+       <div aria-label="Xúc xắc số 2" class="dice" id="dice2" role="img" tabindex="0">
+        ?
+       </div>
+      </div>
+      <div class="dice-container" id="dice3-container">
+       <div aria-label="Xúc xắc số 3" class="dice" id="dice3" role="img" tabindex="0">
+        ?
+       </div>
+      </div>
+     </div>
+     <p class="text-2xl">
+      Kết quả:
+      <span class="font-bold text-yellow-400 text-3xl" id="dice-results">
+       - - -
+      </span>
+     </p>
+     <p class="text-2xl mt-2">
+      Tổng điểm:
+      <span class="text-5xl font-bold text-yellow-400" id="total-result">
+       ?
+      </span>
+     </p>
+    </div>
+    <!-- Vùng chọn trò chơi -->
+    <div class="bg-gray-900 p-6 rounded-lg mb-6">
+     <h2 class="text-xl font-semibold text-cyan-400 mb-4">Chọn trò chơi</h2>
+     <div class="flex space-x-4">
+      <button class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition duration-300" id="game1-btn" type="button">
+       Trò 1: Tổng điểm trên/dưới 10
+      </button>
+      <button class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition duration-300" id="game2-btn" type="button">
+       Trò 2: Đoán tổng điểm xúc xắc
+      </button>
+     </div>
+    </div>
+    <!-- Vùng đặt cược -->
+    <div class="bg-gray-900 p-6 rounded-lg flex flex-col space-y-6">
+     <div>
+      <label class="block text-sm font-medium mb-1" for="bet-amount">
+       Số điểm cược
+      </label>
+      <input class="w-full bg-gray-700 border border-gray-600 text-white text-center text-xl rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" id="bet-amount" max="100000" min="10000" step="1000" type="number" value="10000"/>
+     </div>
+     <div id="game1-options" class="grid grid-cols-2 gap-4">
+      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-lg transition duration-300 text-xl" id="bet-over10" type="button">
+       Tổng điểm trên 10
+      </button>
+      <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-4 rounded-lg transition duration-300 text-xl" id="bet-under10" type="button">
+       Tổng điểm dưới 10
+      </button>
+     </div>
+     <div id="game2-options" class="hidden flex flex-col space-y-4">
+      <label class="block text-sm font-medium mb-1" for="bet-dice-sum">
+       Đoán tổng điểm xúc xắc (3 - 18)
+      </label>
+      <input class="w-full bg-gray-700 border border-gray-600 text-white text-center text-xl rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" id="bet-dice-sum" max="18" min="3" type="number" placeholder="Nhập số từ 3 đến 18"/>
+      <button class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 rounded-lg transition duration-300 text-xl" id="bet-dice-submit" type="button">
+       Đặt cược đoán tổng điểm
+      </button>
+     </div>
+     <div class="flex justify-start space-x-2">
+      <button class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300" onclick="adjustBet(10000)" type="button">
+       +10k
+      </button>
+      <button class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300" onclick="adjustBet(50000)" type="button">
+       +50k
+      </button>
+      <button class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300" onclick="adjustBet('max')" type="button">
+       Max
+      </button>
+     </div>
+    </div>
+    <div class="fixed left-1/2 -translate-x-1/2 bottom-10 bg-gray-900 p-4 rounded-lg text-yellow-400 font-semibold shadow-lg max-w-lg w-full text-center z-50" id="status-message" role="status" aria-live="polite" aria-atomic="true">
+     Sẵn sàng chơi --- chúc bạn may mắn!
+    </div>
+   </div>
+   <!-- Cột Thông tin & Lịch sử (bên phải) -->
+   <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col space-y-6 h-fit">
+    <!-- Thông tin người chơi -->
+    <div class="bg-gray-900 p-4 rounded-lg">
+     <div class="flex justify-between items-center text-lg">
+      <span>
+       ID người chơi
+      </span>
+      <span class="font-mono bg-gray-700 px-2 py-1 rounded" id="player-id">
+      </span>
+     </div>
+     <div class="flex justify-between items-center mt-2 text-lg">
+      <span>
+       Điểm
+      </span>
+      <span class="font-bold text-yellow-400 text-2xl" id="player-points">
+       0
+      </span>
+     </div>
+    </div>
+    <!-- Nạp điểm -->
+    <div>
+     <label class="block text-sm font-medium mb-1" for="deposit-amount">
+      Số điểm nạp
+     </label>
+     <div class="flex gap-2">
+      <input class="w-full bg-gray-700 border border-gray-600 text-white text-center rounded-lg p-2 focus:ring-cyan-500 focus:border-cyan-500" id="deposit-amount" min="1000" type="number" value="10000"/>
+      <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300" id="deposit-btn" type="button">
+       Nạp
+      </button>
+     </div>
+     <p class="text-xs text-gray-400 mt-1">
+      Đã nạp hôm nay:
+      <span id="daily-deposit">
+       0
+      </span>
+      /100,000
+     </p>
+    </div>
+    <!-- Lịch sử đặt cược -->
+    <div>
+     <h2 class="text-xl font-bold text-cyan-400 mb-2">
+      Lịch Sử Cược
+     </h2>
+     <div class="bg-gray-900 rounded-lg h-96 overflow-y-auto" id="history-log">
+      <table class="w-full text-sm text-left">
+       <thead class="text-xs text-gray-400 uppercase bg-gray-700 sticky top-0">
+        <tr>
+         <th class="px-4 py-3" scope="col">
+          Thời gian
+         </th>
+         <th class="px-2 py-3" scope="col">
+          Loại
+         </th>
+         <th class="px-2 py-3" scope="col">
+          Cược
+         </th>
+         <th class="px-2 py-3" scope="col">
+          KQ
+         </th>
+         <th class="px-4 py-3" scope="col">
+          Thay đổi
+         </th>
+        </tr>
+       </thead>
+       <tbody id="history-body">
+        <!-- Lịch sử sẽ được thêm vào đây -->
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <!-- Thống kê -->
+    <div class="bg-gray-900 p-3 rounded-lg text-center text-sm">
+     <span id="stats-line">
+      Tổng ván: 0 | Thắng: 0 | Tỷ lệ thắng: 0%
+     </span>
+    </div>
+    <!-- Liên hệ hỗ trợ -->
+    <div class="bg-gray-900 p-4 rounded-lg flex flex-col space-y-3">
+     <div class="flex items-center space-x-3 text-cyan-400 cursor-pointer hover:text-cyan-300 transition duration-300" onclick="window.open('https://t.me/yourtelegramusername', '_blank')" role="link" tabindex="0" aria-label="Liên hệ hỗ trợ qua Telegram">
+      <i class="fab fa-telegram-plane fa-lg" aria-hidden="true">
+      </i>
+      <span>
+       Liên hệ hỗ trợ qua Telegram
+      </span>
+     </div>
+     <a class="flex items-center space-x-3 text-cyan-400 hover:text-cyan-300 transition duration-300" href="index.html" aria-label="Trò chơi chẵn lẻ">
+      <i class="fas fa-dice fa-lg" aria-hidden="true"></i>
+      <span>
+       Trò chơi chẵn lẻ
+      </span>
+     </a>
+     <button class="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300" id="reset-account-btn" type="button" aria-label="Reset tài khoản">
+      Reset tài khoản
+     </button>
+    </div>
+   </div>
+  </div>
+  <footer aria-label="Thông tin bản quyền và phiên bản" class="mt-3 flex justify-between text-xs text-gray-400 select-none">
+      <div>
+       © Shop game Dopi
+      </div>
+      <div>
+       Phiên bản demo 1.0
+      </div>
+     </footer>
+  <!-- Message Box (Toast) -->
+  <div class="fixed top-5 right-5 bg-gray-800 border-2 border-cyan-500 text-white p-4 rounded-lg shadow-lg opacity-0 transform translate-y-[-20px] pointer-events-none transition-all duration-500 z-50" id="toast-box" role="alert" aria-live="assertive" aria-atomic="true">
+   <p id="toast-content">
+   </p>
+  </div>
+  <!-- Audio elements -->
+  <audio id="audio-roll" preload="auto" src="https://actions.google.com/sounds/v1/dice/dice_roll_1.mp3">
+  </audio>
+  <audio id="audio-win" preload="auto" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg">
+  </audio>
+  <audio id="audio-lose" preload="auto" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg">
+  </audio>
+  <script>
+   // DOM Elements
+        const playerIdEl = document.getElementById('player-id');
+        const playerPointsEl = document.getElementById('player-points');
+        const dailyDepositEl = document.getElementById('daily-deposit');
+        const depositBtn = document.getElementById('deposit-btn');
+        const depositAmountInput = document.getElementById('deposit-amount');
+        const statsLineEl = document.getElementById('stats-line');
+        const historyBodyEl = document.getElementById('history-body');
+        const betAmountInput = document.getElementById('bet-amount');
+        const betOver10Btn = document.getElementById('bet-over10');
+        const betUnder10Btn = document.getElementById('bet-under10');
+        const betDiceSumInput = document.getElementById('bet-dice-sum');
+        const betDiceSubmitBtn = document.getElementById('bet-dice-submit');
+        const diceResultsEl = document.getElementById('dice-results');
+        const totalResultEl = document.getElementById('total-result');
+        const statusMessageEl = document.getElementById('status-message');
+        const toastBox = document.getElementById('toast-box');
+        const toastContent = document.getElementById('toast-content');
+        const diceElems = [
+            document.getElementById('dice1'),
+            document.getElementById('dice2'),
+            document.getElementById('dice3')
+        ];
+
+        const audioRoll = document.getElementById('audio-roll');
+        const audioWin = document.getElementById('audio-win');
+        const audioLose = document.getElementById('audio-lose');
+
+        // Game State
+        let state = {
+            playerId: '',
+            points: 100000,
+            dailyDeposit: 0,
+            lastDepositDate: '',
+            stats: { wins: 0, losses: 0 },
+            history: []
+        };
+
+        let isBetting = false;
+        let currentGame = 1; // 1 or 2
+
+        // --- Initialization ---
+        function initializeGame() {
+            loadState();
+            if (!state.playerId) {
+                state.playerId = 'P-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            }
+            const today = new Date().toISOString().split('T')[0];
+            if (state.lastDepositDate !== today) {
+                state.dailyDeposit = 0;
+                state.lastDepositDate = today;
+            }
+            updateUI();
+            saveState();
+            updateGameUI();
+        }
+
+        // --- State Management ---
+        function saveState() {
+            localStorage.setItem('diceGameStateNew', JSON.stringify(state));
+        }
+        function loadState() {
+            const savedState = localStorage.getItem('diceGameStateNew');
+            if (savedState) {
+                state = JSON.parse(savedState);
+            }
+        }
+
+        // --- UI Update ---
+        function updateUI() {
+            playerIdEl.textContent = state.playerId;
+            playerPointsEl.textContent = state.points.toLocaleString('vi-VN');
+            dailyDepositEl.textContent = state.dailyDeposit.toLocaleString('vi-VN');
+
+            const totalGames = state.stats.wins + state.stats.losses;
+            const winRate = totalGames > 0 ? ((state.stats.wins / totalGames) * 100).toFixed(1) : 0;
+            statsLineEl.textContent = `Tổng ván: ${totalGames} | Thắng: ${state.stats.wins} | Tỷ lệ thắng: ${winRate}%`;
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyBodyEl.innerHTML = '';
+            if (state.history.length === 0) {
+                historyBodyEl.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-4">Chưa có lịch sử cược.</td></tr>';
+                return;
+            }
+            [...state.history].reverse().forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = `bg-gray-800 border-b border-gray-700 ${item.win ? 'history-win' : 'history-loss'}`;
+                const sign = item.pointsChanged > 0 ? '+' : '';
+
+                tr.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap">${new Date(item.time).toLocaleTimeString('vi-VN')}</td>
+                    <td class="px-2 py-2">${item.type}</td>
+                    <td class="px-2 py-2">${item.betAmount.toLocaleString('vi-VN')}</td>
+                    <td class="px-2 py-2 font-bold">${item.diceResult}</td>
+                    <td class="px-4 py-2 font-bold">${sign}${item.pointsChanged.toLocaleString('vi-VN')}</td>
+                `;
+                historyBodyEl.appendChild(tr);
+            });
+        }
+
+        // --- Dice images for numbers 1-6 ---
+        // We'll use placehold.co with text for each dice face
+        function getDiceImageSrc(num) {
+            // Colors: background #111827, text #10B981 (green)
+            return `https://placehold.co/80x80/111827/10B981?text=${num}`;
+        }
+
+        // --- Update UI for selected game ---
+        function updateGameUI() {
+            const game1Options = document.getElementById('game1-options');
+            const game2Options = document.getElementById('game2-options');
+            if (currentGame === 1) {
+                game1Options.classList.remove('hidden');
+                game2Options.classList.add('hidden');
+                betDiceSumInput.value = '';
+            } else {
+                game1Options.classList.add('hidden');
+                game2Options.classList.remove('hidden');
+            }
+            statusMessageEl.textContent = 'Sẵn sàng chơi --- chúc bạn may mắn!';
+            diceResultsEl.textContent = '- - -';
+            totalResultEl.textContent = '?';
+            diceElems.forEach(dice => {
+                dice.textContent = '?';
+                dice.style.color = '#10B981';
+            });
+        }
+
+        // --- Game Logic ---
+        function spinDiceAnimation() {
+            diceElems.forEach(dice => {
+                dice.classList.add('dice-spin');
+                dice.textContent = '?';
+                dice.style.color = '#10B981';
+            });
+            audioRoll.currentTime = 0;
+            audioRoll.play();
+        }
+        function stopDiceAnimation(results) {
+            diceElems.forEach((dice, idx) => {
+                dice.classList.remove('dice-spin');
+                dice.textContent = results[idx];
+                dice.style.color = '#10B981';
+            });
+        }
+
+        function placeBetGame1(choice) {
+            if (isBetting) return;
+
+            const betAmount = parseInt(betAmountInput.value, 10);
+
+            if (isNaN(betAmount) || betAmount < 10000 || betAmount > 100000) {
+                showToast("Số điểm cược không hợp lệ (10,000 - 100,000).");
+                return;
+            }
+            if (betAmount > state.points) {
+                showToast("Bạn không đủ điểm để cược.");
+                return;
+            }
+
+            isBetting = true;
+            toggleButtons(false);
+            statusMessageEl.textContent = 'Đang quay xúc xắc...';
+            totalResultEl.textContent = '...';
+            diceResultsEl.textContent = '...';
+
+            state.points -= betAmount;
+            updateUI();
+
+            spinDiceAnimation();
+
+            setTimeout(() => {
+                const diceResults = [
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1
+                ];
+                const total = diceResults.reduce((a, b) => a + b, 0);
+
+                stopDiceAnimation(diceResults);
+
+                diceResultsEl.textContent = diceResults.join(' - ');
+                totalResultEl.textContent = total;
+
+                let win = false;
+                let pointsChanged = -betAmount;
+                let resultType = '';
+                if (total > 10) {
+                    resultType = 'Trên 10';
+                } else if (total < 10) {
+                    resultType = 'Dưới 10';
+                } else {
+                    resultType = 'Bằng 10';
+                }
+
+                if (resultType === 'Bằng 10') {
+                    pointsChanged = -Math.floor(betAmount / 2);
+                    state.points += (betAmount + pointsChanged);
+                    state.stats.losses++;
+                    statusMessageEl.textContent = `Kết quả là 10, bạn thua mất 1/2 điểm cược.`;
+                    showToast(`Thua! Bạn mất ${Math.floor(betAmount / 2).toLocaleString('vi-VN')} điểm.`);
+                    audioLose.currentTime = 0;
+                    audioLose.play();
+                } else if ((choice === 'over10' && resultType === 'Trên 10') || (choice === 'under10' && resultType === 'Dưới 10')) {
+                    win = true;
+                    pointsChanged = Math.floor(betAmount * 1.85);
+                    state.points += (betAmount + pointsChanged);
+                    state.stats.wins++;
+                    statusMessageEl.textContent = `Thắng! Kết quả là ${total} (${resultType}).`;
+                    showToast(`Thắng! Bạn nhận được ${pointsChanged.toLocaleString('vi-VN')} điểm.`);
+                    audioWin.currentTime = 0;
+                    audioWin.play();
+                } else {
+                    pointsChanged = -betAmount;
+                    state.stats.losses++;
+                    statusMessageEl.textContent = `Thua! Kết quả là ${total} (${resultType}).`;
+                    showToast(`Thua! Bạn mất ${betAmount.toLocaleString('vi-VN')} điểm.`);
+                    audioLose.currentTime = 0;
+                    audioLose.play();
+                }
+
+                state.history.push({
+                    time: new Date().toISOString(),
+                    type: choice === 'over10' ? 'Tổng điểm trên 10' : 'Tổng điểm dưới 10',
+                    betAmount: betAmount,
+                    diceResult: total,
+                    win: win,
+                    pointsChanged: pointsChanged
+                });
+
+                updateUI();
+                saveState();
+                isBetting = false;
+                toggleButtons(true);
+            }, 1500);
+        }
+
+        function placeBetGame2(guess) {
+            if (isBetting) return;
+
+            const betAmount = parseInt(betAmountInput.value, 10);
+            const guessNum = parseInt(guess, 10);
+
+            if (isNaN(betAmount) || betAmount < 10000 || betAmount > 100000) {
+                showToast("Số điểm cược không hợp lệ (10,000 - 100,000).");
+                return;
+            }
+            if (betAmount > state.points) {
+                showToast("Bạn không đủ điểm để cược.");
+                return;
+            }
+            if (isNaN(guessNum) || guessNum < 3 || guessNum > 18) {
+                showToast("Vui lòng nhập tổng điểm đoán hợp lệ (3 - 18).");
+                return;
+            }
+
+            isBetting = true;
+            toggleButtons(false);
+            statusMessageEl.textContent = 'Đang quay xúc xắc...';
+            totalResultEl.textContent = '...';
+            diceResultsEl.textContent = '...';
+
+            state.points -= betAmount;
+            updateUI();
+
+            spinDiceAnimation();
+
+            setTimeout(() => {
+                const diceResults = [
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1
+                ];
+                const total = diceResults.reduce((a, b) => a + b, 0);
+
+                stopDiceAnimation(diceResults);
+
+                diceResultsEl.textContent = diceResults.join(' - ');
+                totalResultEl.textContent = total;
+
+                let win = false;
+                let pointsChanged = -betAmount;
+
+                if (total === guessNum) {
+                    win = true;
+                    pointsChanged = Math.floor(betAmount * 4.25);
+                    state.points += (betAmount + pointsChanged);
+                    state.stats.wins++;
+                    statusMessageEl.textContent = `Thắng! Bạn đoán đúng tổng điểm ${guessNum}.`;
+                    showToast(`Thắng! Bạn nhận được ${pointsChanged.toLocaleString('vi-VN')} điểm.`);
+                    audioWin.currentTime = 0;
+                    audioWin.play();
+                } else {
+                    pointsChanged = -betAmount;
+                    state.stats.losses++;
+                    statusMessageEl.textContent = `Thua! Tổng điểm là ${total}, bạn đoán ${guessNum}.`;
+                    showToast(`Thua! Bạn mất ${betAmount.toLocaleString('vi-VN')} điểm.`);
+                    audioLose.currentTime = 0;
+                    audioLose.play();
+                }
+
+                state.history.push({
+                    time: new Date().toISOString(),
+                    type: `Đoán tổng điểm ${guessNum}`,
+                    betAmount: betAmount,
+                    diceResult: total,
+                    win: win,
+                    pointsChanged: pointsChanged
+                });
+
+                updateUI();
+                saveState();
+                isBetting = false;
+                toggleButtons(true);
+            }, 1500);
+        }
+
+        function toggleButtons(enabled) {
+            betOver10Btn.disabled = !enabled;
+            betUnder10Btn.disabled = !enabled;
+            betDiceSubmitBtn.disabled = !enabled;
+            depositBtn.disabled = !enabled;
+            betOver10Btn.style.opacity = enabled ? 1 : 0.5;
+            betUnder10Btn.style.opacity = enabled ? 1 : 0.5;
+            betDiceSubmitBtn.style.opacity = enabled ? 1 : 0.5;
+            depositBtn.style.opacity = enabled ? 1 : 0.5;
+        }
+
+        window.adjustBet = function(amount) {
+            let currentBet = parseInt(betAmountInput.value, 10);
+            if (isNaN(currentBet)) currentBet = 0;
+
+            if (amount === 'max') {
+                currentBet = Math.min(state.points, 100000);
+            } else {
+                currentBet += amount;
+            }
+
+            if (currentBet > 100000) currentBet = 100000;
+            if (currentBet < 10000) currentBet = 10000;
+
+            betAmountInput.value = currentBet;
+        };
+
+        // --- Event Handlers ---
+        depositBtn.addEventListener('click', () => {
+            const amount = parseInt(depositAmountInput.value, 10);
+            if (isNaN(amount) || amount <= 0) {
+                showToast("Số điểm nạp không hợp lệ.");
+                return;
+            }
+            if (state.dailyDeposit + amount > 100000) {
+                showToast("Vượt quá giới hạn nạp điểm trong ngày.");
+                return;
+            }
+            state.points += amount;
+            state.dailyDeposit += amount;
+            showToast(`Nạp thành công ${amount.toLocaleString('vi-VN')} điểm.`);
+            updateUI();
+            saveState();
+        });
+
+        betOver10Btn.addEventListener('click', () => {
+            if (currentGame !== 1) return;
+            placeBetGame1('over10');
+        });
+        betUnder10Btn.addEventListener('click', () => {
+            if (currentGame !== 1) return;
+            placeBetGame1('under10');
+        });
+        betDiceSubmitBtn.addEventListener('click', () => {
+            if (currentGame !== 2) return;
+            placeBetGame2(betDiceSumInput.value.trim());
+        });
+
+        document.getElementById('game1-btn').addEventListener('click', () => {
+            currentGame = 1;
+            updateGameUI();
+        });
+        document.getElementById('game2-btn').addEventListener('click', () => {
+            currentGame = 2;
+            updateGameUI();
+        });
+
+        // Reset account button
+        document.getElementById('reset-account-btn').addEventListener('click', () => {
+            if (confirm('Bạn có chắc muốn reset tài khoản? Tài khoản sẽ được đặt lại điểm ban đầu 100,000 và lịch sử sẽ bị xóa.')) {
+                state.points = 100000;
+                state.dailyDeposit = 0;
+                state.stats = { wins: 0, losses: 0 };
+                state.history = [];
+                saveState();
+                updateUI();
+                statusMessageEl.textContent = 'Tài khoản đã được reset. Chúc bạn chơi vui!';
+                showToast('Tài khoản đã được reset thành công.');
+            }
+        });
+
+        // --- Utilities ---
+        function showToast(msg) {
+            toastContent.textContent = msg;
+            toastBox.classList.remove('opacity-0', 'translate-y-[-20px]');
+            toastBox.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toastBox.classList.remove('opacity-100', 'translate-y-0');
+                toastBox.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 3000);
+        }
+
+        // Start
+        initializeGame();
+  </script>
+ </body>
+</html>
