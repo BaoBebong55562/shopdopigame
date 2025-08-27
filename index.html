@@ -358,9 +358,9 @@
     <h1>
      Shop game Dopi
     </h1>
-    <div aria-label="Diễn đàn thảo luận" class="contact small">
-     <div class="tg" title="Diễn đàn thảo luận">
-      <a aria-label="Diễn đàn thảo luận" href="https://https://t.me/dopinews" id="tg-link" rel="noopener noreferrer" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px" target="_blank">
+    <div aria-label="Liên hệ Telegram" class="contact small">
+     <div class="tg" title="Liên hệ Telegram">
+      <a aria-label="Liên hệ Telegram @tomxinh917" href="https://t.me/tomxinh917" id="tg-link" rel="noopener noreferrer" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px" target="_blank">
        <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 240 240" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M120 0C53.73 0 0 53.73 0 120s53.73 120 120 120 120-53.73 120-120S186.27 0 120 0z" fill="#06A7D9"/><path d="M45.6 119.4l33.9 12.9 14.8 46.9c1.2 3.8 3.4 4.8 6.9 3 6.5-3.6 51.3-37.8 68.5-50.6 3-2.2 5.4-4.9 2.6-8.2-2.2-2.7-7.2-1-10-0.1L56.2 86.2c-5.9-2.5-5.9 1.8-9.2 5.2-3.1 3.1-5.2 7.1-1.4 13z" fill="#fff"/></svg>
        <span>
         @tomxinh917
@@ -376,8 +376,8 @@
 <p class="small mb-4">
   Quy tắc: Rút 1 số ngẫu nhiên từ 0–9. Người chơi có thể đặt cược theo 
   <strong>Chẵn / Lẻ</strong> hoặc <strong>Theo số</strong>.<br/>
-  - Chọn <strong>Chẵn / Lẻ</strong>: Nếu kết quả trùng với lựa chọn, thắng trả x1.25 lần cược.<br/>
-  - Chọn <strong>Theo số</strong>: Nếu kết quả trùng với số đã chọn, thắng trả x2 lần cược.<br/>
+  - Chọn <strong>Chẵn / Lẻ</strong>: Nếu kết quả trùng với lựa chọn, thắng trả x1.75 lần cược.<br/>
+  - Chọn <strong>Theo số</strong>: Nếu kết quả trùng với số đã chọn, thắng trả x2.55 lần cược.<br/>
   - Mỗi lượt cược từ 10.000 đến 100.000 điểm.<br/>
   - Kết quả hoàn toàn ngẫu nhiên, không có cách nào đảm bảo thắng.<br/><br/>
   Lưu ý: Trò chơi chỉ mang tính giải trí, xả stress. Điểm trong trò chơi không thể đổi thành tiền thật. Không khuyến khích cờ bạc hay đánh bạc thật. Hãy chơi vừa phải, kiểm soát điểm và tâm lý để trải nghiệm vui vẻ và an toàn.
@@ -391,10 +391,10 @@
        </label>
        <select aria-describedby="bet-mode-desc" aria-required="true" class="w-full px-3 py-3 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white text-sm appearance-none cursor-pointer" id="bet-mode" name="bet-mode">
         <option value="parity">
-         Chẵn / Lẻ (x1.25)
+         Chẵn / Lẻ (x1.75)
         </option>
         <option value="number">
-         Theo số (x2)
+         Theo số (x2.55)
         </option>
        </select>
        <p class="sr-only" id="bet-mode-desc">
@@ -470,7 +470,7 @@
          Số dư
         </div>
         <div class="balance select-text" id="balance">
-         0
+         0 điểm
         </div>
        </div>
       </div>
@@ -542,7 +542,7 @@
        </strong>
        điểm.
        <br/>
-       Payout chẵn/lẻ: x1.25 | Theo số: x2
+       Payout chẵn/lẻ: x1.75 | Theo số: x2.55
       </p>
       <div class="mt-2 flex gap-2 flex-wrap">
        <button aria-label="Reset tài khoản" class="btn" id="reset-btn">
@@ -1039,13 +1039,13 @@
         const parity = drawn % 2 === 0 ? 'even' : 'odd';
         choiceText = lastChoice === 'even' ? 'Chẵn' : 'Lẻ';
         if((lastChoice==='even' && parity==='even') || (lastChoice==='odd' && parity==='odd')){
-          win = true; delta = Math.round(bet * 1.25);
+          win = true; delta = Math.round(bet * 1.75);
         }
       } else {
         const chosen = Number(betNumber.value);
         choiceText = 'Số ' + chosen;
         if(drawn === chosen){
-          win = true; delta = Math.round(bet * 2);
+          win = true; delta = Math.round(bet * 2.55);
         }
       }
       const resultText = win ? 'Thắng' : 'Thua';
