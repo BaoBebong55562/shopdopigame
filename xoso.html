@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xổ Số Siêu Tốc — Demo 1.0</title>
+  <title>Xổ Số Siêu Tốc</title>
   <style>
     :root{
       --bg:#071227;--card:#071928;--accent:#f9d34c;--accent-2:#22c55e;--muted:#94a3b8;--glass:rgba(255,255,255,0.06);
@@ -177,15 +177,15 @@
   <canvas id="confettiCanvas"></canvas>
   <div class="app" role="main" aria-label="Xổ Số Siêu Tốc">
     <header>
-      <h1>🎰 Xổ Số Siêu Tốc — Demo 1.0</h1>
-      <div class="muted" aria-live="polite">Shop game Dopi | Không liên quan tiền thật · Lưu localStorage</div>
+      <h1>Xổ Số Siêu Tốc</h1>
+      <div class="muted" aria-live="polite">Shop game Dopi | Không liên quan tiền thật</div>
     </header>
 
     <main class="card center" aria-label="Khu vực chơi xổ số">
       <div class="board">
         <section aria-label="Lưu ý trò chơi">
           <div class="label">Lưu ý</div>
-          <div class="muted">Trò chơi chỉ để giải trí. Dữ liệu lưu cục bộ trên trình duyệt — xóa cache hoặc đổi thiết bị sẽ mất dữ liệu.</div>
+          <div class="muted">Trò chơi chỉ để giải trí. KHÔNG CÁ CƯỢC DƯỚI MỌI HÌNH THỨC.</div>
         </section>
 
         <section aria-label="Dãy số của bạn">
@@ -267,7 +267,13 @@
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <div>
           <h2 id="welcomeTitle">🎉 Chào mừng đến với Xổ Số Siêu Tốc</h2>
-          <div id="welcomeDesc" class="muted" style="max-width:480px;line-height:1.4;">Trò chơi chỉ để giải trí. Không có tiền thật. Dữ liệu lưu cục bộ (localStorage) — mất khi xóa cache hoặc đổi thiết bị.</div>
+          <div id="welcomeDesc" class="muted" style="max-width:480px;line-height:1.4;">
+  Đây là bản demo thử nghiệm, mục đích chính là <b>giải trí</b> và <b>lấy ý kiến người chơi</b>. 
+  Trò chơi không sử dụng tiền thật, dữ liệu chỉ lưu cục bộ (localStorage) và sẽ mất khi xóa cache hoặc đổi thiết bị. 
+  Vì bản game còn sơ sài nên mong các bạn thông cảm. Mọi góp ý, phản hồi vui lòng gửi về qua biểu tượng Telegram ở góc phải màn hình. 
+  <br><br>
+  Chúc bạn chơi vui vẻ 🎮✨
+</div>
         </div>
         <button id="closeWelcome" class="btn primary" aria-label="Bắt đầu chơi">Bắt đầu</button>
       </div>
@@ -826,4 +832,5 @@
     window.addEventListener('beforeunload',()=>saveState(state));
   </script>
 </body>
+
 </html>
