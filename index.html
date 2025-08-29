@@ -336,6 +336,79 @@
     }
   </style>
  </head>
+ <!-- START: Dopi Telegram FAB (self-contained) -->
+<a href="https://t.me/dopinews"
+   class="dopi-telegram-fab"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Mở Telegram DopiNews (mở tab mới)"
+   title="Nhắn tin / Theo dõi trên Telegram — DopiNews">
+  <svg viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+    <path d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm55.7 81.3l-19.3 90.9c-1.5 6.1-5.6 7.6-11.4 4.7l-31.5-23.2-15.2 14.6c-1.7 1.7-3.1 3.1-6.3 3.1l2.3-32.6L169 86.1c3.9-3.4-0.8-5.3-6-1.9L69.6 132.9 43.1 122.3c-6.1-1.9-6.2-6.1 1.3-9.1L201.1 58.2c5.8-1.9 10.9 3.9 6.6 23.1z"/>
+  </svg>
+</a>
+
+<style>
+/* Scoped styles: .dopi-telegram-fab to avoid conflicts */
+.dopi-telegram-fab{
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(135deg,#0088cc 0%, #00a7e6 100%);
+  box-shadow: 0 8px 24px rgba(3,86,134,0.28);
+  z-index: 55; /* default: under modals z-index:60 */
+  transform: translateZ(0);
+  transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s ease, filter .18s ease;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* SVG icon styling */
+.dopi-telegram-fab svg{
+  width: 36px;
+  height: 36px;
+  display: block;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.06));
+  transition: transform .18s ease;
+}
+
+/* Hover + focus */
+.dopi-telegram-fab:hover,
+.dopi-telegram-fab:focus{
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(3,86,134,0.28);
+  outline: none;
+  filter: saturate(1.05);
+}
+.dopi-telegram-fab:hover svg{
+  transform: rotate(-12deg) translateY(-2px);
+}
+
+/* Keyboard visibility */
+.dopi-telegram-fab:focus-visible{
+  box-shadow: 0 0 0 4px rgba(0,167,230,0.18), 0 18px 40px rgba(3,86,134,0.28);
+  border-radius: 50%;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .dopi-telegram-fab,
+  .dopi-telegram-fab svg{ transition: none; transform: none; }
+}
+
+/* Responsive */
+@media (max-width:420px){
+  .dopi-telegram-fab{ width:54px; height:54px; right:14px; bottom:14px; }
+  .dopi-telegram-fab svg{ width:30px; height:30px;}
+}
+</style>
+<!-- END: Dopi Telegram FAB -->
+
  <body>
   <!-- Banner thông báo -->
   <div aria-describedby="announcement-desc" aria-labelledby="announcement-title" aria-modal="true" class="announcement" id="announcement" role="dialog">
@@ -360,7 +433,7 @@
     </h1>
     <div aria-label="Liên hệ Telegram" class="contact small">
      <div class="tg" title="Liên hệ Telegram">
-      <a aria-label="Liên hệ Telegram @tomxinh917" href="https://t.me/tomxinh917" id="tg-link" rel="noopener noreferrer" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px" target="_blank">
+      <a aria-label="Liên hệ Telegram @tomxinh917" href="https://t.me/dopinews" id="tg-link" rel="noopener noreferrer" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px" target="_blank">
        <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 240 240" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M120 0C53.73 0 0 53.73 0 120s53.73 120 120 120 120-53.73 120-120S186.27 0 120 0z" fill="#06A7D9"/><path d="M45.6 119.4l33.9 12.9 14.8 46.9c1.2 3.8 3.4 4.8 6.9 3 6.5-3.6 51.3-37.8 68.5-50.6 3-2.2 5.4-4.9 2.6-8.2-2.2-2.7-7.2-1-10-0.1L56.2 86.2c-5.9-2.5-5.9 1.8-9.2 5.2-3.1 3.1-5.2 7.1-1.4 13z" fill="#fff"/></svg>
        <span>
         @tomxinh917
@@ -550,6 +623,10 @@
        </button>
         <a href="xucsac.html" aria-label="Chơi trò chơi xúc xắc" class="btn" id="dice-game-link" role="link" tabindex="0">
         Trò chơi xúc xắc
+       </a>
+       </button>
+        <a href="xoso.html" aria-label="Chơi trò chơi Xổ Số" class="btn" id="dice-game-link" role="link" tabindex="0">
+        Trò chơi xổ số
        </a>
        <button aria-label="Xuất lịch sử" class="btn" id="export-btn">
         Xuất Lịch sử
